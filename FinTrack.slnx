@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="FinTrack/FinTrack.csproj" />
+  <Project Path="FinTrack.Tests/FinTrack.Tests.csproj" />
+</Solution>

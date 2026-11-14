@@ -1,0 +1,474 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:FinTrack.ViewModels"
+             xmlns:models="using:FinTrack.Models"
+             xmlns:conv="using:FinTrack.Converters"
+             xmlns:converters="using:Avalonia.Data.Converters"
+             x:Class="FinTrack.Views.TransactionsView"
+             x:DataType="vm:TransactionsViewModel"
+             Background="{StaticResource FtBackgroundBrush}">
+
+    <UserControl.Resources>
+        <conv:TransactionTypeToTextConverter x:Key="TypeToText" />
+        <conv:TransactionTypeToBrushConverter x:Key="TypeToBrush" />
+        <conv:HexColorToBrushConverter x:Key="CategoryColorToBrush" />
+    </UserControl.Resources>
+
+    <!-- Прокрутка всей страницы: на минимальной высоте форма, фильтры и список
+         остаются доступными без сжатия и наложений. -->
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled">
+        <Grid Margin="24"
+              RowDefinitions="Auto,Auto,Auto,Auto,Auto"
+              RowSpacing="16">
+
+            <!-- ===================== Шапка ===================== -->
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Транзакции" Classes="h1" />
+                    <TextBlock Text="Доходы, расходы и текущий баланс"
+                               Classes="muted" />
+                </StackPanel>
+
+                <Button Grid.Column="1"
+                        Classes="ghost"
+                        Content="Обновить"
+                        Command="{Binding LoadCommand}"
+                        VerticalAlignment="Center"
+                        ToolTip.Tip="Перечитать операции из базы данных" />
+            </Grid>
+
+            <!-- ===================== Сводка ===================== -->
+            <Grid Grid.Row="1"
+                  ColumnDefinitions="*,*,*"
+                  ColumnSpacing="14">
+
+                <Border Classes="card">
+                    <StackPanel Spacing="8">
+                        <StackPanel Orientation="Horizontal" Spacing="7">
+                            <Border Width="7"
+                                    Height="7"
+                                    CornerRadius="4"
+                                    Background="{StaticResource FtAccentBrush}"
+                                    VerticalAlignment="Center" />
+                            <TextBlock Text="Баланс" Classes="overline" />
+                        </StackPanel>
+                        <TextBlock Text="{Binding Balance, StringFormat={}{0:N2} ₽}"
+                                   Classes="metric"
+                                   FontSize="22"
+                                   Foreground="{StaticResource FtAccentBrush}"
+                                   ToolTip.Tip="{Binding Balance, StringFormat={}{0:N2} ₽}" />
+                        <TextBlock Text="за всё время" Classes="caption" Opacity="0.8" />
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Classes="card">
+                    <StackPanel Spacing="8">
+                        <StackPanel Orientation="Horizontal" Spacing="7">
+                            <Border Width="7"
+                                    Height="7"
+                                    CornerRadius="4"
+                                    Background="{StaticResource FtIncomeBrush}"
+                                    VerticalAlignment="Center" />
+                            <TextBlock Text="Доходы" Classes="overline" />
+                        </StackPanel>
+                        <TextBlock Text="{Binding TotalIncome, StringFormat={}{0:N2} ₽}"
+                                   Classes="metric"
+                                   FontSize="22"
+                                   Foreground="{StaticResource FtIncomeBrush}"
+                                   ToolTip.Tip="{Binding TotalIncome, StringFormat={}{0:N2} ₽}" />
+                        <TextBlock Text="за всё время" Classes="caption" Opacity="0.8" />
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="2" Classes="card">
+                    <StackPanel Spacing="8">
+                        <StackPanel Orientation="Horizontal" Spacing="7">
+                            <Border Width="7"
+                                    Height="7"
+                                    CornerRadius="4"
+                                    Background="{StaticResource FtExpenseBrush}"
+                                    VerticalAlignment="Center" />
+                            <TextBlock Text="Расходы" Classes="overline" />
+                        </StackPanel>
+                        <TextBlock Text="{Binding TotalExpense, StringFormat={}{0:N2} ₽}"
+                                   Classes="metric"
+                                   FontSize="22"
+                                   Foreground="{StaticResource FtExpenseBrush}"
+                                   ToolTip.Tip="{Binding TotalExpense, StringFormat={}{0:N2} ₽}" />
+                        <TextBlock Text="за всё время" Classes="caption" Opacity="0.8" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- ===================== Форма ===================== -->
+            <Border Grid.Row="2" Classes="card" x:Name="FormCard">
+                <StackPanel Spacing="16">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <StackPanel Spacing="3">
+                            <TextBlock Text="{Binding FormTitle}" Classes="h2" />
+                            <TextBlock Text="{Binding FormSubtitle}"
+                                       Classes="caption" />
+                        </StackPanel>
+
+                        <Border Classes="badge"
+                                VerticalAlignment="Center"
+                                IsVisible="{Binding IsEditing}">
+                            <TextBlock Text="Режим изменения"
+                                       Classes="caption"
+                                       Foreground="{StaticResource FtAccentHoverBrush}" />
+                        </Border>
+                    </StackPanel>
+
+                    <Grid ColumnDefinitions="1.1*,1.4*,1.7*,1.2*"
+                          RowDefinitions="Auto,Auto"
+                          ColumnSpacing="14"
+                          RowSpacing="14">
+
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="Тип" Classes="overline" />
+                            <ComboBox Classes="field"
+                                      ItemsSource="{Binding TypeOptions}"
+                                      SelectedItem="{Binding SelectedTypeOption, Mode=TwoWay}"
+                                      HorizontalAlignment="Stretch">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:TransactionTypeOption">
+                                        <TextBlock Text="{Binding Title}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" Spacing="6">
+                            <TextBlock Text="Сумма" Classes="overline" />
+                            <TextBox Classes="field"
+                                     Text="{Binding AmountText}"
+                                     PlaceholderText="0,00" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2" Spacing="6">
+                            <TextBlock Text="Категория" Classes="overline" />
+                            <ComboBox Classes="field"
+                                      ItemsSource="{Binding Categories}"
+                                      SelectedItem="{Binding SelectedCategory, Mode=TwoWay}"
+                                      HorizontalAlignment="Stretch">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate x:DataType="models:Category">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <Border Width="10"
+                                                    Height="10"
+                                                    CornerRadius="5"
+                                                    VerticalAlignment="Center"
+                                                    Background="{Binding Color, Converter={StaticResource CategoryColorToBrush}}" />
+                                            <TextBlock Text="{Binding Name}"
+                                                       VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="3" Spacing="6">
+                            <TextBlock Text="Дата" Classes="overline" />
+                            <CalendarDatePicker Classes="field"
+                                                SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
+                                                HorizontalAlignment="Stretch" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="1"
+                                    Grid.Column="0"
+                                    Grid.ColumnSpan="3"
+                                    Spacing="6">
+                            <TextBlock Text="Описание" Classes="overline" />
+                            <TextBox Classes="field"
+                                     Text="{Binding Description}"
+                                     MaxLength="200"
+                                     PlaceholderText="Комментарий (необязательно)" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="1"
+                                    Grid.Column="3"
+                                    Orientation="Horizontal"
+                                    Spacing="8"
+                                    VerticalAlignment="Bottom"
+                                    HorizontalAlignment="Stretch">
+                            <Button Classes="accent"
+                                    Content="{Binding SaveButtonText}"
+                                    Command="{Binding SaveCommand}"
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center" />
+
+                            <Button Classes="ghost"
+                                    Content="Отмена"
+                                    Command="{Binding CancelEditCommand}"
+                                    IsVisible="{Binding IsEditing}" />
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Ошибки, статус и индикатор загрузки -->
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <ProgressBar Width="120"
+                                     Height="4"
+                                     IsIndeterminate="True"
+                                     VerticalAlignment="Center"
+                                     Foreground="{StaticResource FtAccentBrush}"
+                                     IsVisible="{Binding IsLoading}" />
+
+                        <TextBlock Text="{Binding ErrorMessage}"
+                                   Foreground="{StaticResource FtExpenseBrush}"
+                                   TextWrapping="Wrap"
+                                   VerticalAlignment="Center"
+                                   IsVisible="{Binding ErrorMessage, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" />
+
+                        <TextBlock Text="{Binding StatusMessage}"
+                                   Foreground="{StaticResource FtAccentBrush}"
+                                   TextWrapping="Wrap"
+                                   VerticalAlignment="Center"
+                                   IsVisible="{Binding StatusMessage, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- ===================== Фильтры ===================== -->
+            <Border Grid.Row="3" Classes="card" Padding="16">
+                <StackPanel Spacing="12">
+                    <Grid ColumnDefinitions="2*,1.2*,1.4*,Auto" ColumnSpacing="12">
+                        <StackPanel Spacing="5">
+                            <TextBlock Text="Поиск" Classes="overline" />
+                            <TextBox Classes="field"
+                                     Text="{Binding SearchText, Mode=TwoWay}"
+                                     PlaceholderText="Описание или категория" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" Spacing="5">
+                            <TextBlock Text="Тип" Classes="overline" />
+                            <ComboBox Classes="field"
+                                      ItemsSource="{Binding TypeFilterOptions}"
+                                      SelectedItem="{Binding SelectedTypeFilter, Mode=TwoWay}"
+                                      HorizontalAlignment="Stretch">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:TransactionTypeFilterOption">
+                                        <TextBlock Text="{Binding Title}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2" Spacing="5">
+                            <TextBlock Text="Сортировка" Classes="overline" />
+                            <ComboBox Classes="field"
+                                      ItemsSource="{Binding SortOptions}"
+                                      SelectedItem="{Binding SelectedSortOption, Mode=TwoWay}"
+                                      HorizontalAlignment="Stretch">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:SortOption">
+                                        <TextBlock Text="{Binding Title}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <Button Grid.Column="3"
+                                Classes="ghost"
+                                Content="Сбросить"
+                                Command="{Binding ResetFiltersCommand}"
+                                VerticalAlignment="Bottom"
+                                ToolTip.Tip="Сбросить поиск, фильтры и сортировку" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="1.6*,1*,1*" ColumnSpacing="12">
+                        <StackPanel Spacing="5">
+                            <TextBlock Text="Категория" Classes="overline" />
+                            <ComboBox Classes="field"
+                                      ItemsSource="{Binding FilterCategories}"
+                                      SelectedItem="{Binding SelectedFilterCategory, Mode=TwoWay}"
+                                      HorizontalAlignment="Stretch">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:CategoryFilterOption">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <Border Width="10"
+                                                    Height="10"
+                                                    CornerRadius="5"
+                                                    VerticalAlignment="Center"
+                                                    Background="{Binding Color, Converter={StaticResource CategoryColorToBrush}}"
+                                                    IsVisible="{Binding Color, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" />
+                                            <TextBlock Text="{Binding Title}"
+                                                       VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" Spacing="5">
+                            <TextBlock Text="Дата с" Classes="overline" />
+                            <CalendarDatePicker Classes="field"
+                                                SelectedDate="{Binding FilterStartDate, Mode=TwoWay}"
+                                                HorizontalAlignment="Stretch" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2" Spacing="5">
+                            <TextBlock Text="Дата по" Classes="overline" />
+                            <CalendarDatePicker Classes="field"
+                                                SelectedDate="{Binding FilterEndDate, Mode=TwoWay}"
+                                                HorizontalAlignment="Stretch" />
+                        </StackPanel>
+                    </Grid>
+
+                    <TextBlock Text="{Binding FilterErrorMessage}"
+                               Foreground="{StaticResource FtExpenseBrush}"
+                               FontSize="12"
+                               TextWrapping="Wrap"
+                               IsVisible="{Binding FilterErrorMessage, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" />
+
+                    <TextBlock Text="Итоги вверху рассчитаны по всем операциям — фильтры влияют только на список."
+                               Classes="caption"
+                               Opacity="0.75" />
+                </StackPanel>
+            </Border>
+
+            <!-- ===================== Список ===================== -->
+            <Grid Grid.Row="4"
+                  RowDefinitions="Auto,Auto,Auto"
+                  RowSpacing="10">
+
+                <!-- Подтверждение удаления -->
+                <Border Classes="confirm"
+                        IsVisible="{Binding IsDeleteConfirmationVisible}">
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Удалить операцию?"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource FtTextPrimaryBrush}" />
+                            <TextBlock Text="{Binding DeleteConfirmationText}"
+                                       Classes="caption"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1"
+                                    Orientation="Horizontal"
+                                    Spacing="8"
+                                    VerticalAlignment="Center">
+                            <Button Classes="danger"
+                                    Content="Удалить"
+                                    Command="{Binding ConfirmDeleteCommand}" />
+                            <Button Classes="ghost"
+                                    Content="Отмена"
+                                    Command="{Binding CancelDeleteCommand}" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <Grid Grid.Row="1" ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                    <TextBlock Text="Операции" Classes="h2" VerticalAlignment="Center" />
+
+                    <Border Grid.Column="1" Classes="badge" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding VisibleCount, StringFormat=Показано: {0}}"
+                                   Classes="caption" />
+                    </Border>
+                </Grid>
+
+                <Grid Grid.Row="2">
+                    <ItemsControl ItemsSource="{Binding Transactions}"
+                                  IsVisible="{Binding !IsEmpty}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="models:Transaction">
+                                <Border Classes="txrow" Margin="0,0,0,8">
+                                    <Grid ColumnDefinitions="Auto,*,Auto"
+                                          ColumnSpacing="14">
+
+                                        <Border Width="3"
+                                                CornerRadius="2"
+                                                Margin="0,2"
+                                                VerticalAlignment="Stretch"
+                                                Background="{Binding Category.Color, Converter={StaticResource CategoryColorToBrush}}" />
+
+                                        <StackPanel Grid.Column="1" Spacing="4">
+                                            <TextBlock Text="{Binding Category.Name}"
+                                                       FontSize="14"
+                                                       FontWeight="SemiBold"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       Foreground="{StaticResource FtTextPrimaryBrush}" />
+
+                                            <TextBlock Text="{Binding Description}"
+                                                       FontSize="12"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       Foreground="{StaticResource FtTextSecondaryBrush}"
+                                                       IsVisible="{Binding Description, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" />
+
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <TextBlock Text="{Binding Type, Converter={StaticResource TypeToText}}"
+                                                           FontSize="11"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="{Binding Type, Converter={StaticResource TypeToBrush}}" />
+                                                <TextBlock Text="•" Classes="caption" />
+                                                <TextBlock Text="{Binding Date, StringFormat={}{0:dd.MM.yyyy}}"
+                                                           Classes="caption" />
+                                            </StackPanel>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="2"
+                                                    Spacing="6"
+                                                    HorizontalAlignment="Right"
+                                                    VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Amount, StringFormat={}{0:N2} ₽}"
+                                                       FontSize="16"
+                                                       FontWeight="SemiBold"
+                                                       HorizontalAlignment="Right"
+                                                       Foreground="{Binding Type, Converter={StaticResource TypeToBrush}}" />
+
+                                            <StackPanel Orientation="Horizontal"
+                                                        Spacing="2"
+                                                        HorizontalAlignment="Right">
+                                                <Button Classes="subtle"
+                                                        Content="Изменить"
+                                                        Command="{Binding $parent[UserControl].((vm:TransactionsViewModel)DataContext).EditCommand}"
+                                                        CommandParameter="{Binding}"
+                                                        ToolTip.Tip="Загрузить операцию в форму" />
+                                                <Button Classes="danger"
+                                                        Content="Удалить"
+                                                        Command="{Binding $parent[UserControl].((vm:TransactionsViewModel)DataContext).RequestDeleteCommand}"
+                                                        CommandParameter="{Binding}"
+                                                        ToolTip.Tip="Удалить операцию" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- Пустое состояние / ничего не найдено -->
+                    <Border Classes="card"
+                            VerticalAlignment="Top"
+                            IsVisible="{Binding IsEmpty}">
+                        <StackPanel Spacing="6"
+                                    Margin="0,16"
+                                    HorizontalAlignment="Center">
+                            <Border Width="40"
+                                    Height="40"
+                                    CornerRadius="20"
+                                    Background="{StaticResource FtSurfaceAltBrush}"
+                                    HorizontalAlignment="Center">
+                                <TextBlock Text="₽"
+                                           FontSize="17"
+                                           Foreground="{StaticResource FtTextTertiaryBrush}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                            </Border>
+                            <TextBlock Text="{Binding EmptyTitle}"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       HorizontalAlignment="Center"
+                                       Foreground="{StaticResource FtTextPrimaryBrush}" />
+                            <TextBlock Text="{Binding EmptyDescription}"
+                                       Classes="muted"
+                                       HorizontalAlignment="Center" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

@@ -1,0 +1,89 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:FinTrack.ViewModels"
+        x:Class="FinTrack.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="FinTrack"
+        Background="{StaticResource FtBackgroundBrush}"
+        Width="1200"
+        Height="820"
+        MinWidth="980"
+        MinHeight="680">
+
+    <Grid ColumnDefinitions="230,*">
+
+        <!-- ===================== Боковое меню ===================== -->
+        <Border Background="{StaticResource FtSurfaceBrush}"
+                BorderBrush="{StaticResource FtBorderBrush}"
+                BorderThickness="0,0,1,0">
+            <Grid Margin="18,20" RowDefinitions="Auto,Auto,*,Auto">
+
+                <!-- Логотип и название -->
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                    <Border Width="32"
+                            Height="32"
+                            CornerRadius="10"
+                            Background="{StaticResource FtAccentSoftBrush}"
+                            VerticalAlignment="Center">
+                        <TextBlock Text="F"
+                                   FontSize="16"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource FtAccentBrush}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
+                    </Border>
+
+                    <StackPanel Grid.Column="1"
+                                Spacing="1"
+                                VerticalAlignment="Center">
+                        <TextBlock Text="FinTrack"
+                                   FontSize="18"
+                                   FontWeight="SemiBold"
+                                   LetterSpacing="-0.5"
+                                   Foreground="{StaticResource FtTextPrimaryBrush}" />
+                        <TextBlock Text="Личные финансы" Classes="caption" />
+                    </StackPanel>
+                </Grid>
+
+                <!-- Заголовок секции -->
+                <TextBlock Grid.Row="1"
+                           Text="МЕНЮ"
+                           Classes="overline"
+                           Margin="4,28,0,8" />
+
+                <!-- Навигация -->
+                <StackPanel Grid.Row="2" Spacing="6">
+                    <Button Classes="nav"
+                            Classes.active="{Binding IsDashboardSelected}"
+                            Content="Обзор"
+                            Command="{Binding ShowDashboardCommand}" />
+
+                    <Button Classes="nav"
+                            Classes.active="{Binding IsTransactionsSelected}"
+                            Content="Транзакции"
+                            Command="{Binding ShowTransactionsCommand}" />
+                </StackPanel>
+
+                <!-- Подвал сайдбара -->
+                <StackPanel Grid.Row="3" Spacing="10">
+                    <Border Classes="divider" />
+                    <StackPanel Orientation="Horizontal" Spacing="7">
+                        <Border Width="6"
+                                Height="6"
+                                CornerRadius="3"
+                                Background="{StaticResource FtIncomeBrush}"
+                                VerticalAlignment="Center" />
+                        <TextBlock Text="Данные хранятся локально"
+                                   Classes="caption"
+                                   TextWrapping="Wrap"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ===================== Текущий экран ===================== -->
+        <ContentControl Grid.Column="1" Content="{Binding CurrentViewModel}" />
+    </Grid>
+</Window>

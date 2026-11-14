@@ -1,0 +1,379 @@
+﻿<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="FinTrack.App"
+             xmlns:local="using:FinTrack"
+             RequestedThemeVariant="Dark">
+    <!-- Тёмная тема включена принудительно, чтобы приложение всегда выглядело одинаково. -->
+
+    <Application.DataTemplates>
+        <local:ViewLocator />
+    </Application.DataTemplates>
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <!-- ===================== Палитра ===================== -->
+            <!-- Фон и поверхности: три уровня глубины без ярких градиентов -->
+            <Color x:Key="FtBackgroundColor">#0F1116</Color>
+            <Color x:Key="FtSurfaceColor">#161A21</Color>
+            <Color x:Key="FtSurfaceAltColor">#1D222B</Color>
+            <Color x:Key="FtSurfaceRaisedColor">#222833</Color>
+            <Color x:Key="FtBorderColor">#262C36</Color>
+            <Color x:Key="FtBorderStrongColor">#323A47</Color>
+
+            <!-- Поля ввода -->
+            <Color x:Key="FtFieldColor">#181D25</Color>
+            <Color x:Key="FtFieldBorderColor">#2E3642</Color>
+
+            <!-- Текст -->
+            <Color x:Key="FtTextPrimaryColor">#E9EEF5</Color>
+            <Color x:Key="FtTextSecondaryColor">#96A1B2</Color>
+            <Color x:Key="FtTextTertiaryColor">#6C7787</Color>
+
+            <!-- Акцент: бирюзово-зелёный -->
+            <Color x:Key="FtAccentColor">#2DD4BF</Color>
+            <Color x:Key="FtAccentHoverColor">#5EEAD4</Color>
+            <Color x:Key="FtAccentPressedColor">#14B8A6</Color>
+            <Color x:Key="FtAccentForegroundColor">#06201D</Color>
+            <Color x:Key="FtAccentSoftColor">#12312E</Color>
+            <Color x:Key="FtAccentSoftHoverColor">#17423C</Color>
+
+            <!-- Смысловые цвета -->
+            <Color x:Key="FtIncomeColor">#34D399</Color>
+            <Color x:Key="FtExpenseColor">#F87171</Color>
+            <Color x:Key="FtDangerSoftColor">#3A1D22</Color>
+
+            <!-- Акцент для стандартных контролов Fluent -->
+            <Color x:Key="SystemAccentColor">#2DD4BF</Color>
+            <Color x:Key="SystemAccentColorLight1">#5EEAD4</Color>
+            <Color x:Key="SystemAccentColorLight2">#99F6E4</Color>
+            <Color x:Key="SystemAccentColorLight3">#CCFBF1</Color>
+            <Color x:Key="SystemAccentColorDark1">#14B8A6</Color>
+            <Color x:Key="SystemAccentColorDark2">#0F9488</Color>
+            <Color x:Key="SystemAccentColorDark3">#0B7A70</Color>
+
+            <!-- ===================== Кисти ===================== -->
+            <SolidColorBrush x:Key="FtBackgroundBrush" Color="{StaticResource FtBackgroundColor}" />
+            <SolidColorBrush x:Key="FtSurfaceBrush" Color="{StaticResource FtSurfaceColor}" />
+            <SolidColorBrush x:Key="FtSurfaceAltBrush" Color="{StaticResource FtSurfaceAltColor}" />
+            <SolidColorBrush x:Key="FtSurfaceRaisedBrush" Color="{StaticResource FtSurfaceRaisedColor}" />
+            <SolidColorBrush x:Key="FtBorderBrush" Color="{StaticResource FtBorderColor}" />
+            <SolidColorBrush x:Key="FtBorderStrongBrush" Color="{StaticResource FtBorderStrongColor}" />
+
+            <SolidColorBrush x:Key="FtFieldBrush" Color="{StaticResource FtFieldColor}" />
+            <SolidColorBrush x:Key="FtFieldBorderBrush" Color="{StaticResource FtFieldBorderColor}" />
+
+            <SolidColorBrush x:Key="FtTextPrimaryBrush" Color="{StaticResource FtTextPrimaryColor}" />
+            <SolidColorBrush x:Key="FtTextSecondaryBrush" Color="{StaticResource FtTextSecondaryColor}" />
+            <SolidColorBrush x:Key="FtTextTertiaryBrush" Color="{StaticResource FtTextTertiaryColor}" />
+
+            <SolidColorBrush x:Key="FtAccentBrush" Color="{StaticResource FtAccentColor}" />
+            <SolidColorBrush x:Key="FtAccentHoverBrush" Color="{StaticResource FtAccentHoverColor}" />
+            <SolidColorBrush x:Key="FtAccentPressedBrush" Color="{StaticResource FtAccentPressedColor}" />
+            <SolidColorBrush x:Key="FtAccentForegroundBrush" Color="{StaticResource FtAccentForegroundColor}" />
+            <SolidColorBrush x:Key="FtAccentSoftBrush" Color="{StaticResource FtAccentSoftColor}" />
+            <SolidColorBrush x:Key="FtAccentSoftHoverBrush" Color="{StaticResource FtAccentSoftHoverColor}" />
+
+            <SolidColorBrush x:Key="FtIncomeBrush" Color="{StaticResource FtIncomeColor}" />
+            <SolidColorBrush x:Key="FtExpenseBrush" Color="{StaticResource FtExpenseColor}" />
+            <SolidColorBrush x:Key="FtDangerSoftBrush" Color="{StaticResource FtDangerSoftColor}" />
+        </ResourceDictionary>
+    </Application.Resources>
+
+    <Application.Styles>
+        <FluentTheme />
+
+        <!-- ===================== Тексты ===================== -->
+        <Style Selector="TextBlock.h1">
+            <Setter Property="FontSize" Value="26" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="LetterSpacing" Value="-0.4" />
+            <Setter Property="Foreground" Value="{StaticResource FtTextPrimaryBrush}" />
+        </Style>
+
+        <Style Selector="TextBlock.h2">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="LetterSpacing" Value="-0.1" />
+            <Setter Property="Foreground" Value="{StaticResource FtTextPrimaryBrush}" />
+        </Style>
+
+        <!-- Мелкая подпись над значением: «ОБЩИЙ БАЛАНС», «ТИП» и т. п. -->
+        <Style Selector="TextBlock.overline">
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="LetterSpacing" Value="0.6" />
+            <Setter Property="Foreground" Value="{StaticResource FtTextTertiaryBrush}" />
+        </Style>
+
+        <!-- Крупная финансовая сумма в карточке -->
+        <Style Selector="TextBlock.metric">
+            <Setter Property="FontSize" Value="17" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="LetterSpacing" Value="-0.6" />
+            <Setter Property="Foreground" Value="{StaticResource FtTextPrimaryBrush}" />
+            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+        </Style>
+
+        <Style Selector="TextBlock.muted">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Foreground" Value="{StaticResource FtTextSecondaryBrush}" />
+        </Style>
+
+        <Style Selector="TextBlock.caption">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Foreground" Value="{StaticResource FtTextSecondaryBrush}" />
+        </Style>
+
+        <!-- ===================== Контейнеры ===================== -->
+        <Style Selector="Border.card">
+            <Setter Property="Background" Value="{StaticResource FtSurfaceBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource FtBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="16" />
+            <Setter Property="Padding" Value="18" />
+        </Style>
+
+        <!-- Группа переключения месяца / сегментированный контрол -->
+        <Style Selector="Border.pill">
+            <Setter Property="Background" Value="{StaticResource FtFieldBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource FtBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="Padding" Value="4" />
+        </Style>
+
+        <!-- Строка операции -->
+        <Style Selector="Border.txrow">
+            <Setter Property="Background" Value="{StaticResource FtSurfaceAltBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource FtBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="Padding" Value="12,12" />
+        </Style>
+
+        <!-- Небольшой счётчик/метка -->
+        <Style Selector="Border.badge">
+            <Setter Property="Background" Value="{StaticResource FtSurfaceAltBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource FtBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="7" />
+            <Setter Property="Padding" Value="9,3" />
+        </Style>
+
+        <Style Selector="Border.divider">
+            <Setter Property="Background" Value="{StaticResource FtBorderBrush}" />
+            <Setter Property="Height" Value="1" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+        </Style>
+
+        <!-- ===================== Кнопки ===================== -->
+        <!-- Базовые размеры задаём только «своим» кнопкам, чтобы не задеть
+             внутренние кнопки шаблонов стандартных контролов. -->
+        <Style Selector="Button.accent, Button.ghost, Button.danger">
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Padding" Value="15,9" />
+            <Setter Property="MinHeight" Value="36" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+
+        <Style Selector="Button.accent">
+            <Setter Property="Background" Value="{StaticResource FtAccentBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource FtAccentForegroundBrush}" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+        <Style Selector="Button.accent:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource FtAccentHoverBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource FtAccentForegroundBrush}" />
+        </Style>
+        <Style Selector="Button.accent:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource FtAccentPressedBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource FtAccentForegroundBrush}" />
+        </Style>
+
+        <Style Selector="Button.ghost">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource FtTextSecondaryBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource FtBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+        <Style Selector="Button.ghost:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource FtSurfaceAltBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource FtTextPrimaryBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource FtBorderStrongBrush}" />
+        </Style>
+        <Style Selector="Button.ghost:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource FtSurfaceRaisedBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource FtTextPrimaryBrush}" />
+        </Style>
+
+        <!-- Компактная «ссылка» удаления -->
+        <Style Selector="Button.danger">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource FtExpenseBrush}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="8,4" />
+            <Setter Property="MinHeight" Value="26" />
+            <Setter Property="FontSize" Value="12" />
+        </Style>
+        <Style Selector="Button.danger:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource FtDangerSoftBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource FtExpenseBrush}" />
+        </Style>
+        <Style Selector="Button.danger:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource FtDangerSoftBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource FtExpenseBrush}" />
+        </Style>
+
+        <!-- Компактная нейтральная кнопка строки (например, «Изменить») -->
+        <Style Selector="Button.subtle">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource FtTextSecondaryBrush}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="8,4" />
+            <Setter Property="MinHeight" Value="26" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+        <Style Selector="Button.subtle:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource FtSurfaceRaisedBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource FtTextPrimaryBrush}" />
+        </Style>
+        <Style Selector="Button.subtle:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource FtSurfaceAltBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource FtTextPrimaryBrush}" />
+        </Style>
+
+        <!-- Панель подтверждения удаления -->
+        <Style Selector="Border.confirm">
+            <Setter Property="Background" Value="{StaticResource FtDangerSoftBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource FtExpenseBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="Padding" Value="14,12" />
+        </Style>
+
+        <!-- Круглая иконочная кнопка (стрелки месяца, второстепенные действия) -->
+        <Style Selector="Button.icon">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource FtTextSecondaryBrush}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="9" />
+            <Setter Property="Width" Value="32" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <Style Selector="Button.icon:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource FtSurfaceAltBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource FtTextPrimaryBrush}" />
+        </Style>
+        <Style Selector="Button.icon:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource FtSurfaceRaisedBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource FtTextPrimaryBrush}" />
+        </Style>
+        <Style Selector="Button.icon:disabled /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource FtTextTertiaryBrush}" />
+            <Setter Property="Opacity" Value="0.45" />
+        </Style>
+
+        <!-- ===================== Фокус с клавиатуры ===================== -->
+        <Style Selector="Button.accent:focus-visible /template/ ContentPresenter#PART_ContentPresenter,
+                         Button.ghost:focus-visible /template/ ContentPresenter#PART_ContentPresenter,
+                         Button.danger:focus-visible /template/ ContentPresenter#PART_ContentPresenter,
+                         Button.subtle:focus-visible /template/ ContentPresenter#PART_ContentPresenter,
+                         Button.nav:focus-visible /template/ ContentPresenter#PART_ContentPresenter,
+                         Button.icon:focus-visible /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="BorderBrush" Value="{StaticResource FtAccentBrush}" />
+            <Setter Property="BorderThickness" Value="2" />
+        </Style>
+
+        <!-- ===================== Поля ввода ===================== -->
+        <!-- Класс field добавляется явно, чтобы не менять внутренние TextBox
+             у составных контролов (например, CalendarDatePicker). -->
+        <Style Selector="TextBox.field, ComboBox.field, NumericUpDown.field, CalendarDatePicker.field">
+            <Setter Property="Background" Value="{StaticResource FtFieldBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource FtTextPrimaryBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource FtFieldBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="9" />
+            <Setter Property="MinHeight" Value="38" />
+            <Setter Property="Padding" Value="11,7" />
+            <Setter Property="FontSize" Value="13" />
+        </Style>
+
+        <Style Selector="TextBox.field:pointerover, ComboBox.field:pointerover, NumericUpDown.field:pointerover, CalendarDatePicker.field:pointerover">
+            <Setter Property="BorderBrush" Value="{StaticResource FtBorderStrongBrush}" />
+        </Style>
+
+        <Style Selector="TextBox.field:focus, ComboBox.field:focus, NumericUpDown.field:focus, CalendarDatePicker.field:focus">
+            <Setter Property="BorderBrush" Value="{StaticResource FtAccentBrush}" />
+        </Style>
+
+        <!-- Внутренняя рамка TextBox: тема Fluent на фокусе красит её в чёрный,
+             поэтому удерживаем фон поля и подсвечиваем только рамку. -->
+        <Style Selector="TextBox.field /template/ Border#PART_BorderElement">
+            <Setter Property="Background" Value="{StaticResource FtFieldBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource FtFieldBorderBrush}" />
+        </Style>
+        <Style Selector="TextBox.field:pointerover /template/ Border#PART_BorderElement">
+            <Setter Property="Background" Value="{StaticResource FtFieldBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource FtBorderStrongBrush}" />
+        </Style>
+        <Style Selector="TextBox.field:focus /template/ Border#PART_BorderElement">
+            <Setter Property="Background" Value="{StaticResource FtFieldBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource FtAccentBrush}" />
+        </Style>
+
+        <Style Selector="TextBox.field">
+            <Setter Property="PlaceholderForeground" Value="{StaticResource FtTextTertiaryBrush}" />
+        </Style>
+
+        <!-- ===================== Навигация ===================== -->
+        <Style Selector="Button.nav">
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource FtTextSecondaryBrush}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Padding" Value="13,10" />
+            <Setter Property="MinHeight" Value="40" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+        <Style Selector="Button.nav:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource FtSurfaceAltBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource FtTextPrimaryBrush}" />
+        </Style>
+        <Style Selector="Button.nav:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource FtSurfaceRaisedBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource FtTextPrimaryBrush}" />
+        </Style>
+
+        <Style Selector="Button.nav.active">
+            <Setter Property="Background" Value="{StaticResource FtAccentSoftBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource FtAccentHoverBrush}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+        <Style Selector="Button.nav.active:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource FtAccentSoftHoverBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource FtAccentHoverBrush}" />
+        </Style>
+
+        <!-- ===================== Подсказки ===================== -->
+        <Style Selector="ToolTip">
+            <Setter Property="Background" Value="{StaticResource FtSurfaceRaisedBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource FtBorderStrongBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="10,6" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Foreground" Value="{StaticResource FtTextPrimaryBrush}" />
+        </Style>
+    </Application.Styles>
+</Application>

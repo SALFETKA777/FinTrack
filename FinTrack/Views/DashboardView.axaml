@@ -1,0 +1,382 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:FinTrack.ViewModels"
+             xmlns:models="using:FinTrack.Models"
+             xmlns:conv="using:FinTrack.Converters"
+             xmlns:converters="using:Avalonia.Data.Converters"
+             xmlns:sp="clr-namespace:ScottPlot.Avalonia;assembly=ScottPlot.Avalonia"
+             x:Class="FinTrack.Views.DashboardView"
+             x:DataType="vm:DashboardViewModel"
+             Background="{StaticResource FtBackgroundBrush}">
+
+    <UserControl.Resources>
+        <conv:TransactionTypeToTextConverter x:Key="TypeToText" />
+        <conv:TransactionTypeToBrushConverter x:Key="TypeToBrush" />
+        <conv:HexColorToBrushConverter x:Key="CategoryColorToBrush" />
+    </UserControl.Resources>
+
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+        <Grid Margin="24"
+              RowDefinitions="Auto,Auto,Auto,Auto"
+              RowSpacing="16">
+
+            <!-- ===================== Шапка ===================== -->
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Обзор" Classes="h1" />
+                    <TextBlock Text="Финансовая сводка и последние операции"
+                               Classes="muted" />
+
+                    <!-- Индикатор загрузки и ошибки -->
+                    <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,6,0,0">
+                        <ProgressBar Width="120"
+                                     Height="4"
+                                     IsIndeterminate="True"
+                                     VerticalAlignment="Center"
+                                     Foreground="{StaticResource FtAccentBrush}"
+                                     IsVisible="{Binding IsLoading}" />
+
+                        <TextBlock Text="{Binding ErrorMessage}"
+                                   Foreground="{StaticResource FtExpenseBrush}"
+                                   TextWrapping="Wrap"
+                                   VerticalAlignment="Center"
+                                   IsVisible="{Binding ErrorMessage, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" />
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Переключение месяцев -->
+                <Border Grid.Column="1"
+                        Classes="pill"
+                        VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Spacing="2">
+                        <Button Classes="icon"
+                                Content="‹"
+                                FontSize="18"
+                                Command="{Binding PreviousMonthCommand}"
+                                ToolTip.Tip="Предыдущий месяц" />
+
+                        <TextBlock Text="{Binding MonthTitle}"
+                                   FontSize="14"
+                                   FontWeight="SemiBold"
+                                   MinWidth="140"
+                                   TextAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Foreground="{StaticResource FtTextPrimaryBrush}" />
+
+                        <Button Classes="icon"
+                                Content="›"
+                                FontSize="18"
+                                Command="{Binding NextMonthCommand}"
+                                ToolTip.Tip="Следующий месяц" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- ===================== Карточки статистики ===================== -->
+            <Grid Grid.Row="1"
+                  ColumnDefinitions="*,*,*,*"
+                  ColumnSpacing="14">
+
+                <Border Classes="card">
+                    <StackPanel Spacing="8">
+                        <StackPanel Orientation="Horizontal" Spacing="7">
+                            <Border Width="7"
+                                    Height="7"
+                                    CornerRadius="4"
+                                    Background="{StaticResource FtAccentBrush}"
+                                    VerticalAlignment="Center" />
+                            <TextBlock Text="Общий баланс" Classes="overline" />
+                        </StackPanel>
+                        <TextBlock Text="{Binding TotalBalance, StringFormat={}{0:N2} ₽}"
+                                   Classes="metric"
+                                   Foreground="{StaticResource FtAccentBrush}"
+                                   ToolTip.Tip="{Binding TotalBalance, StringFormat={}{0:N2} ₽}" />
+                        <TextBlock Text="за всё время" Classes="caption" Opacity="0.8" />
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Classes="card">
+                    <StackPanel Spacing="8">
+                        <StackPanel Orientation="Horizontal" Spacing="7">
+                            <Border Width="7"
+                                    Height="7"
+                                    CornerRadius="4"
+                                    Background="{StaticResource FtIncomeBrush}"
+                                    VerticalAlignment="Center" />
+                            <TextBlock Text="Доходы за месяц" Classes="overline" />
+                        </StackPanel>
+                        <TextBlock Text="{Binding MonthIncome, StringFormat={}{0:N2} ₽}"
+                                   Classes="metric"
+                                   Foreground="{StaticResource FtIncomeBrush}"
+                                   ToolTip.Tip="{Binding MonthIncome, StringFormat={}{0:N2} ₽}" />
+                        <TextBlock Text="{Binding MonthTitle}" Classes="caption" Opacity="0.8" />
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="2" Classes="card">
+                    <StackPanel Spacing="8">
+                        <StackPanel Orientation="Horizontal" Spacing="7">
+                            <Border Width="7"
+                                    Height="7"
+                                    CornerRadius="4"
+                                    Background="{StaticResource FtExpenseBrush}"
+                                    VerticalAlignment="Center" />
+                            <TextBlock Text="Расходы за месяц" Classes="overline" />
+                        </StackPanel>
+                        <TextBlock Text="{Binding MonthExpense, StringFormat={}{0:N2} ₽}"
+                                   Classes="metric"
+                                   Foreground="{StaticResource FtExpenseBrush}"
+                                   ToolTip.Tip="{Binding MonthExpense, StringFormat={}{0:N2} ₽}" />
+                        <TextBlock Text="{Binding MonthTitle}" Classes="caption" Opacity="0.8" />
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="3" Classes="card">
+                    <StackPanel Spacing="8">
+                        <StackPanel Orientation="Horizontal" Spacing="7">
+                            <Border Width="7"
+                                    Height="7"
+                                    CornerRadius="4"
+                                    Background="{StaticResource FtTextSecondaryBrush}"
+                                    VerticalAlignment="Center" />
+                            <TextBlock Text="Баланс месяца" Classes="overline" />
+                        </StackPanel>
+                        <TextBlock Text="{Binding MonthBalance, StringFormat={}{0:N2} ₽}"
+                                   Classes="metric"
+                                   Foreground="{StaticResource FtTextPrimaryBrush}"
+                                   ToolTip.Tip="{Binding MonthBalance, StringFormat={}{0:N2} ₽}" />
+                        <TextBlock Text="доходы минус расходы" Classes="caption" Opacity="0.8" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- ===================== Графики ===================== -->
+            <Grid Grid.Row="2"
+                  ColumnDefinitions="3*,2*"
+                  ColumnSpacing="14">
+
+                <!-- Столбчатая диаграмма доходов и расходов -->
+                <Border Classes="card" ClipToBounds="True">
+                    <Grid RowDefinitions="Auto,*" RowSpacing="12">
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="Доходы и расходы" Classes="h2" />
+                                <TextBlock Text="Последние 6 месяцев" Classes="caption" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1"
+                                        Orientation="Horizontal"
+                                        Spacing="6"
+                                        VerticalAlignment="Center">
+                                <Border Classes="badge">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <Border Width="8"
+                                                Height="8"
+                                                CornerRadius="4"
+                                                VerticalAlignment="Center"
+                                                Background="{StaticResource FtIncomeBrush}" />
+                                        <TextBlock Text="Доходы"
+                                                   FontSize="11"
+                                                   Foreground="{StaticResource FtTextSecondaryBrush}"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Classes="badge">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <Border Width="8"
+                                                Height="8"
+                                                CornerRadius="4"
+                                                VerticalAlignment="Center"
+                                                Background="{StaticResource FtExpenseBrush}" />
+                                        <TextBlock Text="Расходы"
+                                                   FontSize="11"
+                                                   Foreground="{StaticResource FtTextSecondaryBrush}"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+
+                        <sp:AvaPlot x:Name="TrendPlot"
+                                    Grid.Row="1"
+                                    MinHeight="230" />
+                    </Grid>
+                </Border>
+
+                <!-- Круговая диаграмма расходов по категориям -->
+                <Border Grid.Column="1" Classes="card" ClipToBounds="True">
+                    <Grid RowDefinitions="Auto,*,Auto" RowSpacing="10">
+                        <StackPanel Spacing="3">
+                            <TextBlock Text="Расходы по категориям" Classes="h2" />
+                            <TextBlock Text="{Binding MonthTitle}" Classes="caption" />
+                        </StackPanel>
+
+                        <Grid Grid.Row="1" MinHeight="190">
+                            <sp:AvaPlot x:Name="CategoryPlot"
+                                        Height="190"
+                                        IsVisible="{Binding HasCategoryExpenses}" />
+
+                            <StackPanel HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Spacing="6"
+                                        IsVisible="{Binding !HasCategoryExpenses}">
+                                <Border Width="40"
+                                        Height="40"
+                                        CornerRadius="20"
+                                        Background="{StaticResource FtSurfaceAltBrush}"
+                                        HorizontalAlignment="Center">
+                                    <TextBlock Text="₽"
+                                               FontSize="17"
+                                               Foreground="{StaticResource FtTextTertiaryBrush}"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center" />
+                                </Border>
+                                <TextBlock Text="Нет расходов за выбранный месяц"
+                                           Classes="muted"
+                                           TextWrapping="Wrap"
+                                           TextAlignment="Center"
+                                           MaxWidth="220" />
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Легенда категорий -->
+                        <ItemsControl Grid.Row="2"
+                                      ItemsSource="{Binding CategoryShares}"
+                                      IsVisible="{Binding HasCategoryExpenses}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="models:CategoryShare">
+                                    <Grid ColumnDefinitions="Auto,*,Auto,Auto"
+                                          ColumnSpacing="8"
+                                          Margin="0,3,0,0">
+                                        <Border Width="8"
+                                                Height="8"
+                                                CornerRadius="4"
+                                                VerticalAlignment="Center"
+                                                Background="{Binding Color, Converter={StaticResource CategoryColorToBrush}}" />
+
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{Binding CategoryName}"
+                                                   FontSize="12"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="{StaticResource FtTextPrimaryBrush}" />
+
+                                        <TextBlock Grid.Column="2"
+                                                   Text="{Binding Share, StringFormat={}{0:P0}}"
+                                                   FontSize="11"
+                                                   MinWidth="36"
+                                                   TextAlignment="Right"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="{StaticResource FtTextSecondaryBrush}" />
+
+                                        <TextBlock Grid.Column="3"
+                                                   Text="{Binding Amount, StringFormat={}{0:N2} ₽}"
+                                                   FontSize="12"
+                                                   FontWeight="SemiBold"
+                                                   TextAlignment="Right"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="{StaticResource FtTextPrimaryBrush}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- ===================== Последние операции ===================== -->
+            <Border Grid.Row="3" Classes="card">
+                <Grid RowDefinitions="Auto,Auto" RowSpacing="12">
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                        <TextBlock Text="Последние операции" Classes="h2" />
+                        <TextBlock Grid.Column="1"
+                                   Text="5 самых новых за всё время"
+                                   Classes="caption"
+                                   VerticalAlignment="Center" />
+                    </Grid>
+
+                    <ItemsControl Grid.Row="1"
+                                  ItemsSource="{Binding RecentTransactions}"
+                                  IsVisible="{Binding HasRecentTransactions}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="models:Transaction">
+                                <Border Classes="txrow" Margin="0,0,0,8">
+                                    <Grid ColumnDefinitions="Auto,*,Auto"
+                                          ColumnSpacing="12">
+
+                                        <Border Width="3"
+                                                CornerRadius="2"
+                                                Margin="0,2"
+                                                VerticalAlignment="Stretch"
+                                                Background="{Binding Category.Color, Converter={StaticResource CategoryColorToBrush}}" />
+
+                                        <StackPanel Grid.Column="1" Spacing="3">
+                                            <TextBlock Text="{Binding Category.Name}"
+                                                       FontSize="14"
+                                                       FontWeight="SemiBold"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       Foreground="{StaticResource FtTextPrimaryBrush}" />
+
+                                            <TextBlock Text="{Binding Description}"
+                                                       FontSize="12"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       Foreground="{StaticResource FtTextSecondaryBrush}"
+                                                       IsVisible="{Binding Description, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}" />
+
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <TextBlock Text="{Binding Type, Converter={StaticResource TypeToText}}"
+                                                           FontSize="11"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="{Binding Type, Converter={StaticResource TypeToBrush}}" />
+                                                <TextBlock Text="•" Classes="caption" />
+                                                <TextBlock Text="{Binding Date, StringFormat={}{0:dd.MM.yyyy}}"
+                                                           Classes="caption" />
+                                            </StackPanel>
+                                        </StackPanel>
+
+                                        <TextBlock Grid.Column="2"
+                                                   Text="{Binding Amount, StringFormat={}{0:N2} ₽}"
+                                                   FontSize="15"
+                                                   FontWeight="SemiBold"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="{Binding Type, Converter={StaticResource TypeToBrush}}" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- Пустое состояние -->
+                    <StackPanel Grid.Row="1"
+                                Spacing="6"
+                                Margin="0,18"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                IsVisible="{Binding !HasRecentTransactions}">
+                        <Border Width="40"
+                                Height="40"
+                                CornerRadius="20"
+                                Background="{StaticResource FtSurfaceAltBrush}"
+                                HorizontalAlignment="Center">
+                            <TextBlock Text="₽"
+                                       FontSize="17"
+                                       Foreground="{StaticResource FtTextTertiaryBrush}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                        </Border>
+                        <TextBlock Text="Пока нет операций"
+                                   FontSize="14"
+                                   FontWeight="SemiBold"
+                                   HorizontalAlignment="Center"
+                                   Foreground="{StaticResource FtTextPrimaryBrush}" />
+                        <TextBlock Text="Добавьте доход или расход в разделе «Транзакции»."
+                                   Classes="muted"
+                                   TextAlignment="Center"
+                                   HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </ScrollViewer>
+</UserControl>
